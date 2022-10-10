@@ -1,18 +1,18 @@
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Factory } from 'nestjs-seeder';
+import { Factory } from 'nestjs-seeder-impsdc';
 
 @Schema()
 export class User extends Document {
   // @Factory will automatically inject faker to the function that you pass.
-  @Factory(faker => faker.random.arrayElement(['male', 'female']))
+  @Factory(faker => faker.helpers.arrayElement(['male', 'female']))
   @Prop({ required: true })
   gender: string;
 
   // You could get the previously generated value using the passed context.
   @Factory((faker, ctx) => ({
-    first: faker.name.firstName(ctx.gender === 'male' ? 0 : 1),
-    last: faker.name.lastName(ctx.gender === 'male' ? 0 : 1),
+    first: faker.name.firstName(ctx.gender),
+    last: faker.name.lastName(ctx.gender),
   }))
   @Prop(
     raw({
@@ -41,6 +41,10 @@ export class User extends Document {
   @Factory((faker, ctx) => `${faker.address.streetAddress()} ${ctx.zipCode}`)
   @Prop({ required: true })
   address: string;
+
+  @Factory((faker, ctx) => faker.random.alphaNumeric(13))
+  @Prop({ required: true })
+  ean: string;
 }
 
 export const userSchema = SchemaFactory.createForClass(User);
